@@ -38,16 +38,25 @@ def draw_bar_plot():
     df_copy = df.copy()
     df_copy['date'] = pd.to_datetime(df_copy.index)
     df_copy['year'] = df_copy['date'].dt.year
-    df_copy['month'] = df_copy['date'].dt.strftime('%B')
+    df_copy['month'] = df_copy['date'].dt.month_name()
+
+    # Create a categorical type for months to ensure they are in order
+    month_order = ['January', 'February', 'March', 'April', 'May', 'June', 
+                   'July', 'August', 'September', 'October', 'November', 'December']
+    df_copy['month'] = pd.Categorical(df_copy['month'], categories=month_order, ordered=True)
+
+    # Group by year and month, then calculate the mean
     df_bar = df_copy.groupby(['year', 'month'])['value'].mean().unstack()
 
     # Draw bar plot
     fig, ax = plt.subplots(figsize=(10, 8))
     df_bar.plot(kind='bar', ax=ax, width=0.8)
 
+    # Set labels
     ax.set_xlabel('Years')
     ax.set_ylabel('Average Page Views')
 
+    # Set legend title and position
     fig.legend(title='Months', bbox_to_anchor=(1.0, 1.0))
 
     plt.tight_layout()
